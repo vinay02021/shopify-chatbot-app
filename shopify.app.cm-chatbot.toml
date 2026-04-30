@@ -1,0 +1,19 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "22fd33b51543a595bba86bdcd5a5a353"
+name = "CM Chatbot"
+application_url = "https://your-tunnel-url"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2026-07"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products"
+
+[auth]
+redirect_urls = [ "https://your-tunnel-url/auth/callback" ]

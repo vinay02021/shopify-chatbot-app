@@ -1,0 +1,21 @@
+name = "CM Chatbot"
+client_id = "22fd33b51543a595bba86bdcd5a5a353"
+application_url = "http://localhost:3000"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+
+[auth]
+redirect_urls = [
+  "http://localhost:3000/auth/callback"
+]
+
+[access_scopes]
+scopes = "read_products"
+
+[webhooks]
+api_version = "2026-04"
+
+[pos]
+embedded = false

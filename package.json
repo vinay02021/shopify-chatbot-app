@@ -1,0 +1,28 @@
+{
+  "name": "shopify-embedded-express-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:web\"",
+    "dev:server": "nodemon server/server.js",
+    "dev:web": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "start": "node server/server.js",
+    "install:all": "npm install && npm --prefix web install"
+  },
+  "dependencies": {
+    "@shopify/shopify-api": "^11.0.0",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=18.20.0"
+  }
+}
