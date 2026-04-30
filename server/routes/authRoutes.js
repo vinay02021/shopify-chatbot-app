@@ -1,9 +1,14 @@
 import express from "express";
-import { authCallback, beginAuth } from "../controllers/authController.js";
 
-const router = express.Router();
+export const authRoutes = express.Router();
 
-router.get("/auth", beginAuth);
-router.get("/auth/callback", authCallback);
+authRoutes.get("/auth", (req, res) => {
+  const { shop } = req.query;
 
-export const authRoutes = router;
+  if (!shop) {
+    return res.status(400).send("Missing shop parameter");
+  }
+
+  // temporary auth simulation
+  res.send(`Auth started for ${shop}`);
+});
