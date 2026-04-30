@@ -8,15 +8,14 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// AUTH ROUTES ADD
+// 🔥 VERY IMPORTANT
 app.use(authRoutes);
 
-// BASIC ROUTE
+// test routes
 app.get("/", (req, res) => {
   res.send("Shopify App Backend Running ✅");
 });
 
-// API TEST
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
 });
