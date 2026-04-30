@@ -1,26 +1,23 @@
 import express from "express";
-import cors from "cors";
-import { authRoutes } from "./routes/authRoutes.js";
 
-const app = express();
-const port = process.env.PORT || 3000;
+export const authRoutes = express.Router();
 
-app.use(cors());
-app.use(express.json());
+// 🔹 START AUTH
+authRoutes.get("/auth", (req, res) => {
+  const { shop } = req.query;
 
-// AUTH ROUTES ADD
-app.use(authRoutes);
+  if (!shop) {
+    return res.status(400).send("Missing shop parameter");
+  }
 
-// BASIC ROUTE
-app.get("/", (req, res) => {
-  res.send("Shopify App Backend Running ✅");
+  // 👉 simulate redirect to callback
+  return res.redirect(`/auth/callback?shop=${shop}`);
 });
 
-// API TEST
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok" });
-});
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+// 🔹 CALLBACK (STEP 1 - TEST)
+authRoutes.get("/auth/callback", (req, res) => {
+  const { shop } = req.query;
+
+  res.send(`✅ Auth flow working for ${shop}`);
 });
