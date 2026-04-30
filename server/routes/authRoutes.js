@@ -1,51 +1,26 @@
 import express from "express";
-import { shopify } from "../config/shopify.js";
+import cors from "cors";
+import { authRoutes } from "./routes/authRoutes.js";
 
-export const authRoutes = express.Router();
+const app = express();
+const port = process.env.PORT || 3000;
 
+app.use(cors());
+app.use(express.json());
 
-// START AUTH
-authRoutes.get("/auth", async (req, res) => {
-  try {
-    const { shop } = req.query;
+// AUTH ROUTES ADD
+app.use(authRoutes);
 
-    if (!shop) {
-      return res.status(400).send("Missing shop parameter");
-    }
-
-    return await shopify.auth.begin({
-      shop,
-      callbackPath: "/auth/callback",
-      isOnline: false,
-      rawRequest: req,
-      rawResponse: res,
-    });
-  } catch (error) {
-    console.error("Auth Begin Error:", error);
-    res.status(500).send("Auth begin failed");
-  }
+// BASIC ROUTE
+app.get("/", (req, res) => {
+  res.send("Shopify App Backend Running ✅");
 });
 
+// API TEST
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
 
-// CALLBACK
-authRoutes.get("/auth/callback", async (req, res) => {
-  try {
-    const callbackResponse = await shopify.auth.callback({
-      rawRequest: req,
-      rawResponse: res,
-    });
-
-    const { session } = callbackResponse;
-
-    if (!session) {
-      return res.status(400).send("No session found");
-    }
-
-    // IMPORTANT: redirect back to app
-    return res.redirect(`/?shop=${session.shop}`);
-
-  } catch (error) {
-    console.error("Auth Callback Error:", error);
-    res.status(500).send("Auth failed");
-  }
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
