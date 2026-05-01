@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   AppProvider,
   Frame,
@@ -12,21 +13,26 @@ import {
 import "@shopify/polaris/build/esm/styles.css";
 import enTranslations from "@shopify/polaris/locales/en.json";
 
-// 🔥 IMPORT PAGES
 import Dashboard from "./pages/Dashboard";
 import Faq from "./pages/Faq";
 
 export default function App() {
-
-  //  simple page switch (basic routing)
-  const currentPage = "dashboard"; 
+  const [page, setPage] = useState("dashboard");
 
   const navigation = (
-    <Navigation location="/">
+    <Navigation location={page}>
       <Navigation.Section
         items={[
-          { label: "Dashboard", icon: HomeIcon },
-          { label: "FAQ Manager", icon: QuestionCircleIcon },
+          {
+            label: "Dashboard",
+            icon: HomeIcon,
+            onClick: () => setPage("dashboard"),
+          },
+          {
+            label: "FAQ Manager",
+            icon: QuestionCircleIcon,
+            onClick: () => setPage("faq"),
+          },
         ]}
       />
     </Navigation>
@@ -35,10 +41,8 @@ export default function App() {
   return (
     <AppProvider i18n={enTranslations}>
       <Frame navigation={navigation}>
-        
-        {currentPage === "dashboard" && <Dashboard />}
-        {currentPage === "faq" && <Faq />}
-
+        {page === "dashboard" && <Dashboard />}
+        {page === "faq" && <Faq />}
       </Frame>
     </AppProvider>
   );
