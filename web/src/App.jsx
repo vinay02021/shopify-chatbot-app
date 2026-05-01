@@ -1,20 +1,40 @@
-import { useEffect, useState } from "react";
-import { AppProvider, Frame } from "@shopify/polaris";
+import {
+  AppProvider,
+  Frame,
+  Navigation,
+  Page,
+  Card,
+} from "@shopify/polaris";
+
+import {
+  HomeIcon,
+  QuestionCircleIcon,
+} from "@shopify/polaris-icons";
+
+import "@shopify/polaris/build/esm/styles.css";
 import enTranslations from "@shopify/polaris/locales/en.json";
-import Dashboard from "./pages/Dashboard.jsx";
-import { initializeAppBridge } from "./utils/appBridge.js";
 
 export default function App() {
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    initializeAppBridge();
-    setIsReady(true);
-  }, []);
+  const navigation = (
+    <Navigation location="/">
+      <Navigation.Section
+        items={[
+          { label: "Dashboard", icon: HomeIcon },
+          { label: "FAQ Manager", icon: QuestionCircleIcon },
+        ]}
+      />
+    </Navigation>
+  );
 
   return (
     <AppProvider i18n={enTranslations}>
-      <Frame>{isReady ? <Dashboard /> : null}</Frame>
+      <Frame navigation={navigation}>
+        <Page title="Dashboard">
+          <Card sectioned>
+            <p>🚀 Chatbot Dashboard Working</p>
+          </Card>
+        </Page>
+      </Frame>
     </AppProvider>
   );
 }
