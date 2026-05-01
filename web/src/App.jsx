@@ -2,8 +2,6 @@ import {
   AppProvider,
   Frame,
   Navigation,
-  Page,
-  Card,
 } from "@shopify/polaris";
 
 import {
@@ -14,7 +12,15 @@ import {
 import "@shopify/polaris/build/esm/styles.css";
 import enTranslations from "@shopify/polaris/locales/en.json";
 
+// 🔥 IMPORT PAGES
+import Dashboard from "./pages/Dashboard";
+import Faq from "./pages/Faq";
+
 export default function App() {
+
+  //  simple page switch (basic routing)
+  const currentPage = "dashboard"; 
+
   const navigation = (
     <Navigation location="/">
       <Navigation.Section
@@ -29,11 +35,10 @@ export default function App() {
   return (
     <AppProvider i18n={enTranslations}>
       <Frame navigation={navigation}>
-        <Page title="Dashboard">
-          <Card sectioned>
-            <p>🚀 Chatbot Dashboard Working</p>
-          </Card>
-        </Page>
+        
+        {currentPage === "dashboard" && <Dashboard />}
+        {currentPage === "faq" && <Faq />}
+
       </Frame>
     </AppProvider>
   );
