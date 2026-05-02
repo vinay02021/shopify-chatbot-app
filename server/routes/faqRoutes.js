@@ -3,24 +3,57 @@ import { Faq } from "../models/Faq.js";
 
 export const faqRoutes = express.Router();
 
-// GET all FAQs
+// 🔥 GET ALL FAQS
 faqRoutes.get("/", async (req, res) => {
-  const faqs = await Faq.find();
-  res.json(faqs);
+  try {
+    const faqs = await Faq.find().sort({ createdAt: -1 });
+    res.json(faqs);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch FAQs" });
+  }
 });
 
-// ADD FAQ
+// 🔥 ADD FAQ
 faqRoutes.post("/", async (req, res) => {
-  const { question, answer } = req.body;
+  try {
+    const { question, answer } = req.body;
 
-  const faq = new Faq({ question, answer });
-  await faq.save();
+    if (!question || !answer) {
+      return res.status(400).json({ error: "Missing fields" });
+    }
 
-  res.json(faq);
+    const faq = new Faq({ question, answer });
+    await faq.save();
+
+    res.json(faq);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to add FAQ" });
+  }
 });
 
-// DELETE FAQ
+// 🔥 UPDATE FAQ
+faqRoutes.put("/:id", async (req, res) => {
+  try {
+    const { question, answer } = req.body;
+
+    const updated = await Faq.findByIdAndUpdate(
+      req.params.id,
+      { question, answer },
+      { new: true }
+    );
+
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update FAQ" });
+  }
+});
+
+// 🔥 DELETE FAQ
 faqRoutes.delete("/:id", async (req, res) => {
-  await Faq.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+  try {
+    await Faq.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete FAQ" });
+  }
 });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Page,
   Card,
@@ -14,41 +14,62 @@ export default function Faq() {
   const [faqs, setFaqs] = useState([]);
   const [editId, setEditId] = useState(null);
 
-  // 🔥 Add / Update FAQ
-  const handleSubmit = () => {
+  // 🔥 LOAD FAQS FROM API
+  const loadFaqs = async () => {
+    const res = await fetch("/api/faq");
+    const data = await res.json();
+    setFaqs(data);
+  };
+
+  useEffect(() => {
+    loadFaqs();
+  }, []);
+
+  // 🔥 ADD / UPDATE
+  const handleSubmit = async () => {
     if (!question || !answer) return;
 
     if (editId) {
-      // update
-      const updated = faqs.map((f) =>
-        f.id === editId ? { ...f, question, answer } : f
-      );
-      setFaqs(updated);
+      // UPDATE
+      await fetch(`/api/faq/${editId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question, answer }),
+      });
+
       setEditId(null);
     } else {
-      // add
-      const newFaq = {
-        id: Date.now(),
-        question,
-        answer,
-      };
-      setFaqs([newFaq, ...faqs]);
+      // ADD
+      await fetch("/api/faq", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question, answer }),
+      });
     }
 
     setQuestion("");
     setAnswer("");
+    loadFaqs();
   };
 
-  // 🔥 Delete
-  const deleteFaq = (id) => {
-    setFaqs(faqs.filter((f) => f.id !== id));
+  // 🔥 DELETE
+  const deleteFaq = async (id) => {
+    await fetch(`/api/faq/${id}`, {
+      method: "DELETE",
+    });
+
+    loadFaqs();
   };
 
-  // 🔥 Edit
+  // 🔥 EDIT
   const editFaq = (faq) => {
     setQuestion(faq.question);
     setAnswer(faq.answer);
-    setEditId(faq.id);
+    setEditId(faq._id);
   };
 
   return (
@@ -82,7 +103,7 @@ export default function Faq() {
 
         <BlockStack gap="300">
           {faqs.map((faq) => (
-            <Card key={faq.id} sectioned>
+            <Card key={faq._id} sectioned>
               <InlineStack align="space-between">
                 <div>
                   <p><strong>Q:</strong> {faq.question}</p>
@@ -96,7 +117,7 @@ export default function Faq() {
 
                   <Button
                     tone="critical"
-                    onClick={() => deleteFaq(faq.id)}
+                    onClick={() => deleteFaq(faq._id)}
                   >
                     Delete
                   </Button>

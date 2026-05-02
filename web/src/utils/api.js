@@ -1,10 +1,22 @@
-export async function fetchShopDetails(shop) {
-  const response = await fetch(`/api/shop?shop=${encodeURIComponent(shop)}`);
-  const payload = await response.json();
+export const getFaqs = async () => {
+  const res = await fetch(`/api/faq`);
+  return res.json();
+};
 
-  if (!response.ok) {
-    throw new Error(payload.error || "Shop details request failed.");
-  }
+export const addFaq = async (data) => {
+  const res = await fetch(`/api/faq`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
-  return payload;
-}
+  return res.json();
+};
+
+export const deleteFaq = async (id) => {
+  await fetch(`/api/faq/${id}`, {
+    method: "DELETE",
+  });
+};
