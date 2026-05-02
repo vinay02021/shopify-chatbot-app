@@ -1,9 +1,7 @@
-const BASE_URL = window.location.origin;
+const BASE_URL = "https://shopify-chatbot-app-8fyh.onrender.com";
 
 export const getFaqs = async () => {
-  const res = await fetch(`${BASE_URL}/api/faq`, {
-    credentials: "include",
-  });
+  const res = await fetch(`${BASE_URL}/api/faq`);
   return res.json();
 };
 
@@ -13,7 +11,6 @@ export const addFaq = async (data) => {
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
     body: JSON.stringify(data),
   });
   return res.json();
@@ -22,6 +19,5 @@ export const addFaq = async (data) => {
 export const deleteFaq = async (id) => {
   await fetch(`${BASE_URL}/api/faq/${id}`, {
     method: "DELETE",
-    credentials: "include",
   });
 };
