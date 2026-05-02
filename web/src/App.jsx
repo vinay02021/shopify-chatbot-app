@@ -24,7 +24,7 @@ export default function App() {
       <Navigation.Section
         items={[
           {
-            label: "Dashboard",
+            label: "Overview",
             icon: HomeIcon,
             onClick: () => setPage("dashboard"),
           },

@@ -1,21 +1,26 @@
 import express from "express";
+import { Faq } from "../models/Faq.js";
 
 export const faqRoutes = express.Router();
 
-// GET FAQs
-faqRoutes.get("/", (req, res) => {
-  res.json([
-    { question: "Where is my order?", answer: "Track your order here." },
-    { question: "Return policy?", answer: "You can return within 7 days." }
-  ]);
+// GET all FAQs
+faqRoutes.get("/", async (req, res) => {
+  const faqs = await Faq.find();
+  res.json(faqs);
 });
 
 // ADD FAQ
-faqRoutes.post("/", (req, res) => {
+faqRoutes.post("/", async (req, res) => {
   const { question, answer } = req.body;
 
-  res.json({
-    message: "FAQ added",
-    data: { question, answer }
-  });
+  const faq = new Faq({ question, answer });
+  await faq.save();
+
+  res.json(faq);
+});
+
+// DELETE FAQ
+faqRoutes.delete("/:id", async (req, res) => {
+  await Faq.findByIdAndDelete(req.params.id);
+  res.json({ message: "Deleted" });
 });

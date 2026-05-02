@@ -3,8 +3,11 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
+import { connectDatabase } from "./config/database.js";
 import { authRoutes } from "./routes/authRoutes.js";
 import { faqRoutes } from "./routes/faqRoutes.js";
+
+await connectDatabase();
 
 const app = express();
 const port = process.env.PORT || 3000;
