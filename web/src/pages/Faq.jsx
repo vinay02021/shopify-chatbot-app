@@ -16,7 +16,9 @@ export default function Faq() {
 
   // 🔥 LOAD FAQS FROM API
   const loadFaqs = async () => {
-    const res = await fetch("/api/faq");
+    const res = await fetch("/api/faq", {
+      credentials: "include",
+    });
     const data = await res.json();
     setFaqs(data);
   };
@@ -36,6 +38,7 @@ export default function Faq() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ question, answer }),
       });
 
@@ -47,6 +50,7 @@ export default function Faq() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ question, answer }),
       });
     }
@@ -60,6 +64,7 @@ export default function Faq() {
   const deleteFaq = async (id) => {
     await fetch(`/api/faq/${id}`, {
       method: "DELETE",
+      credentials: "include",
     });
 
     loadFaqs();

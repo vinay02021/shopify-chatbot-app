@@ -14,7 +14,14 @@ const port = process.env.PORT || 3000;
 app.set("trust proxy", 1);
 
 // middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // API + AUTH ROUTES
