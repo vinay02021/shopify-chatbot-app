@@ -8,19 +8,25 @@ import {
   InlineStack,
 } from "@shopify/polaris";
 
+import { fetchWithAuth } from "../utils/fetch";
+
+const BASE_URL = "https://shopify-chatbot-app-8fyh.onrender.com";
+
 export default function Faq() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [faqs, setFaqs] = useState([]);
   const [editId, setEditId] = useState(null);
 
-  // 🔥 LOAD FAQS FROM API
+  // 🔥 LOAD FAQS
   const loadFaqs = async () => {
-    const res = await fetch("/api/faq", {
-      credentials: "include",
-    });
-    const data = await res.json();
-    setFaqs(data);
+    try {
+      const res = await fetchWithAuth(`${BASE_URL}/api/faq`);
+      const data = await res.json();
+      setFaqs(data);
+    } catch (err) {
+      console.error("❌ Load FAQ error:", err);
+    }
   };
 
   useEffect(() => {
@@ -31,43 +37,48 @@ export default function Faq() {
   const handleSubmit = async () => {
     if (!question || !answer) return;
 
-    if (editId) {
-      // UPDATE
-      await fetch(`/api/faq/${editId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ question, answer }),
-      });
+    try {
+      if (editId) {
+        // UPDATE
+        await fetchWithAuth(`${BASE_URL}/api/faq/${editId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ question, answer }),
+        });
 
-      setEditId(null);
-    } else {
-      // ADD
-      await fetch("/api/faq", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ question, answer }),
-      });
+        setEditId(null);
+      } else {
+        // ADD
+        await fetchWithAuth(`${BASE_URL}/api/faq`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ question, answer }),
+        });
+      }
+
+      setQuestion("");
+      setAnswer("");
+      loadFaqs();
+    } catch (err) {
+      console.error("❌ Submit error:", err);
     }
-
-    setQuestion("");
-    setAnswer("");
-    loadFaqs();
   };
 
   // 🔥 DELETE
   const deleteFaq = async (id) => {
-    await fetch(`/api/faq/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
+    try {
+      await fetchWithAuth(`${BASE_URL}/api/faq/${id}`, {
+        method: "DELETE",
+      });
 
-    loadFaqs();
+      loadFaqs();
+    } catch (err) {
+      console.error("❌ Delete error:", err);
+    }
   };
 
   // 🔥 EDIT
@@ -96,7 +107,7 @@ export default function Faq() {
             multiline={3}
           />
 
-          <Button primary onClick={handleSubmit}>
+          <Button primary onClick={handleSubmit} type="button">
             {editId ? "Update FAQ" : "Add FAQ"}
           </Button>
         </BlockStack>
@@ -116,13 +127,14 @@ export default function Faq() {
                 </div>
 
                 <InlineStack gap="200">
-                  <Button onClick={() => editFaq(faq)}>
+                  <Button onClick={() => editFaq(faq)} type="button">
                     Edit
                   </Button>
 
                   <Button
                     tone="critical"
                     onClick={() => deleteFaq(faq._id)}
+                    type="button"
                   >
                     Delete
                   </Button>
