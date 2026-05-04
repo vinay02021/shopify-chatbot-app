@@ -1,11 +1,14 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 
 import { connectDatabase } from "./config/database.js";
 import { authRoutes } from "./routes/authRoutes.js";
 import { faqRoutes } from "./routes/faqRoutes.js";
+import { settingsRoutes } from "./routes/settingsRoutes.js";
+import { publicRoutes } from "./routes/publicRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,9 +24,31 @@ app.use(
 );
 app.use(express.json());
 
-// API + AUTH ROUTES
+// 🔥 ===== CHAT WIDGET (ENV INJECTION) =====
+app.get("/chat-widget.js", (req, res) => {
+  try {
+    const baseUrl = process.env.SHOPIFY_APP_URL;
+
+    const filePath = path.join(process.cwd(), "public/chat-widget.js");
+    const file = fs.readFileSync(filePath, "utf8");
+
+    res.setHeader("Content-Type", "application/javascript");
+
+    res.send(`
+      window.CHATBOT_APP_URL = "${baseUrl}";
+      ${file}
+    `);
+  } catch (err) {
+    console.error("Widget error:", err);
+    res.status(500).send("Widget load failed");
+  }
+});
+
+// 🔥 API + AUTH ROUTES
 app.use(authRoutes);
 app.use("/api/faq", faqRoutes);
+app.use("/api/settings", settingsRoutes);
+app.use("/api/public", publicRoutes);
 
 // health check
 app.get("/api/health", (req, res) => {
@@ -42,7 +67,7 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../web/dist/index.html"));
 });
 
-// 🔥 SAFE START FUNCTION
+// 🔥 START SERVER
 const startServer = async () => {
   try {
     await connectDatabase();
