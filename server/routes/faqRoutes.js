@@ -1,12 +1,13 @@
 import express from "express";
 import { Faq } from "../models/Faq.js";
+import { verifyShopify } from "../middleware/verifyShopify.js";
 
 export const faqRoutes = express.Router();
 
-// 🔥 GET ALL FAQS
-faqRoutes.get("/", async (req, res) => {
+// 🔥 GET ALL FAQS (shop-wise)
+faqRoutes.get("/", verifyShopify, async (req, res) => {
   try {
-    const faqs = await Faq.find().sort({ createdAt: -1 });
+    const faqs = await Faq.find({ shop: req.shop }).sort({ createdAt: -1 });
     res.json(faqs);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch FAQs" });
@@ -14,7 +15,7 @@ faqRoutes.get("/", async (req, res) => {
 });
 
 // 🔥 ADD FAQ
-faqRoutes.post("/", async (req, res) => {
+faqRoutes.post("/", verifyShopify, async (req, res) => {
   try {
     const { question, answer } = req.body;
 
@@ -22,7 +23,12 @@ faqRoutes.post("/", async (req, res) => {
       return res.status(400).json({ error: "Missing fields" });
     }
 
-    const faq = new Faq({ question, answer });
+    const faq = new Faq({
+      question,
+      answer,
+      shop: req.shop, // 🔥 important
+    });
+
     await faq.save();
 
     res.json(faq);
@@ -31,13 +37,13 @@ faqRoutes.post("/", async (req, res) => {
   }
 });
 
-// 🔥 UPDATE FAQ
-faqRoutes.put("/:id", async (req, res) => {
+// 🔥 UPDATE FAQ (secure)
+faqRoutes.put("/:id", verifyShopify, async (req, res) => {
   try {
     const { question, answer } = req.body;
 
-    const updated = await Faq.findByIdAndUpdate(
-      req.params.id,
+    const updated = await Faq.findOneAndUpdate(
+      { _id: req.params.id, shop: req.shop }, // 🔥 ownership check
       { question, answer },
       { new: true }
     );
@@ -48,10 +54,14 @@ faqRoutes.put("/:id", async (req, res) => {
   }
 });
 
-// 🔥 DELETE FAQ
-faqRoutes.delete("/:id", async (req, res) => {
+// 🔥 DELETE FAQ (secure)
+faqRoutes.delete("/:id", verifyShopify, async (req, res) => {
   try {
-    await Faq.findByIdAndDelete(req.params.id);
+    await Faq.findOneAndDelete({
+      _id: req.params.id,
+      shop: req.shop, // 🔥 ownership check
+    });
+
     res.json({ message: "Deleted" });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete FAQ" });
