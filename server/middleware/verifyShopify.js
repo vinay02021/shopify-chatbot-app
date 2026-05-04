@@ -16,8 +16,15 @@ export const verifyShopify = (req, res, next) => {
       return res.status(401).json({ error: "Invalid token" });
     }
 
-    // 🔥 shop extract
-    const shop = decoded.dest.replace("https://", "");
+    let shop = decoded.dest.replace("https://", "");
+
+    // 🔥 IMPORTANT FIX
+    if (shop.includes("admin.shopify.com/store/")) {
+      const name = shop.split("/store/")[1];
+      shop = `${name}.myshopify.com`;
+    }
+
+    console.log("✅ FINAL SHOP:", shop); // debug
 
     req.shop = shop;
 
